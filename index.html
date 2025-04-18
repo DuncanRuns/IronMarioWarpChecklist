@@ -83,28 +83,86 @@
         .card-body {
             padding: 1rem;
         }
+
+        /* New compact layout styles */
+        .compact-layout {
+            width: 100%;
+            /* Allow it to expand to full width */
+            margin: 0 auto;
+        }
+
+        .section-container {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-label {
+            width: 100px;
+            flex-shrink: 0;
+            font-weight: bold;
+            padding-top: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        .section-items {
+            flex-grow: 1;
+        }
+
+        .warp-item {
+            padding: 0.15rem 0.25rem !important;
+            margin-bottom: 0.15rem;
+            font-size: 0.8rem;
+        }
+
+        .card-body {
+            padding: 0.5rem;
+        }
+
+        .card-header {
+            padding: 0.5rem;
+        }
+
+        .section-divider {
+            margin: 0.25rem 0;
+        }
+
+        /* Hide section labels for OBS cropping if needed */
+        .hide-labels .section-label {
+            display: none;
+        }
+
+        .hide-labels .section-items {
+            width: 100%;
+        }
+
+        /* Make buttons more compact */
+        .btn-icon {
+            padding: 0.25rem 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container py-4">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h1 class="h3 mb-0">Iron Mario 64 Warp Checklist</h1>
+    <div class="container py-2">
+        <div class="card mb-2 compact-layout">
+            <div class="card-header bg-primary text-white d-flex justify-content-end align-items-center">
                 <div class="d-flex">
-                    <button id="themeToggle" class="btn btn-outline-light me-2">
-                        <span class="theme-text">🌙 Dark Mode</span>
+                    <button id="layoutToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
+                        <span>Hide Labels</span>
                     </button>
-                    <button id="clearBtn" class="btn btn-danger">Reset</button>
+                    <button id="themeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
+                        <span class="theme-text">🌙</span>
+                    </button>
+                    <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset</button>
                 </div>
             </div>
             <div class="card-body">
                 <div id="warpList">
                     <!-- Warps will be added here by JavaScript -->
                 </div>
-            </div>
-            <div class="card-footer text-center text-muted">
-                Click on a warp to mark it as used
             </div>
         </div>
     </div>
@@ -148,6 +206,16 @@
                 }
             });
 
+            // Add layout toggle functionality
+            const layoutToggle = document.getElementById('layoutToggle');
+            const compactLayout = document.querySelector('.compact-layout');
+
+            layoutToggle.addEventListener('click', () => {
+                compactLayout.classList.toggle('hide-labels');
+                layoutToggle.querySelector('span').textContent =
+                    compactLayout.classList.contains('hide-labels') ? 'Show Labels' : 'Hide Labels';
+            });
+
             const sections = {
                 "First Floor": [
                     "Bob-omb Battlefield",
@@ -185,29 +253,31 @@
             const clearBtn = document.getElementById('clearBtn');
 
             Object.entries(sections).forEach(([sectionName, sectionWarps]) => {
-                // Create section header
-                const sectionHeader = document.createElement('h5');
-                sectionHeader.className = 'mt-4 mb-3 section-header';
-                sectionHeader.textContent = sectionName;
-                warpList.appendChild(sectionHeader);
+                // Create section container
+                const sectionContainer = document.createElement('div');
+                sectionContainer.className = 'section-container';
+                warpList.appendChild(sectionContainer);
 
-                // Create row for this section
-                const sectionRow = document.createElement('div');
-                sectionRow.className = 'row';
-                warpList.appendChild(sectionRow);
+                // Create section label
+                const sectionLabel = document.createElement('div');
+                sectionLabel.className = 'section-label';
+                sectionLabel.textContent = sectionName;
+                sectionContainer.appendChild(sectionLabel);
+
+                // Create section items container
+                const sectionItems = document.createElement('div');
+                sectionItems.className = 'section-items';
+                sectionContainer.appendChild(sectionItems);
 
                 // Add warps for this section
                 sectionWarps.forEach(warp => {
-                    const col = document.createElement('div');
-                    col.className = 'col-lg-3 col-md-4 col-sm-6 mb-2'; // Added col-lg-3 for 4 items per row on large screens
-
                     const item = document.createElement('div');
-                    item.className = 'warp-item p-2 rounded d-flex align-items-center';
+                    item.className = 'warp-item rounded d-flex align-items-center';
                     item.dataset.warp = warp;
 
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.className = 'form-check-input me-2';
+                    checkbox.className = 'form-check-input me-1';
 
                     // For Bob-omb Battlefield, ensure it's checked by default
                     if (warp === "Bob-omb Battlefield") {
@@ -221,8 +291,7 @@
 
                     item.appendChild(checkbox);
                     item.appendChild(label);
-                    col.appendChild(item);
-                    sectionRow.appendChild(col);
+                    sectionItems.appendChild(item);
 
                     // Add click event
                     item.addEventListener('click', function () {
@@ -231,7 +300,7 @@
                     });
                 });
 
-                // After all warps are added to a section, add a divider (except after the last section)
+                // Add divider after each section except the last
                 if (sectionName !== "Misc.") {
                     const divider = document.createElement('div');
                     divider.className = 'section-divider';
