@@ -293,15 +293,16 @@
                     item.appendChild(label);
                     sectionItems.appendChild(item);
 
-                    // Add click event
-                    item.addEventListener('click', function () {
-                        this.classList.toggle('checked');
-                        checkbox.checked = !checkbox.checked;
-                    });
-
-                    // Prevent double-toggling when clicking directly on checkbox
-                    checkbox.addEventListener('click', function (event) {
-                        event.stopPropagation();
+                    // Add click event for the item
+                    item.addEventListener('click', function (event) {
+                        if (event.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                        }
+                        if (checkbox.checked) {
+                            this.classList.add('checked');
+                        } else {
+                            this.classList.remove('checked');
+                        }
                     });
                 });
 
