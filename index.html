@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Mario 64 Warp Checklist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .warp-item {
+            transition: background-color 0.3s;
+        }
+
+        .warp-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .warp-item.checked {
+            background-color: rgba(40, 167, 69, 0.2);
+            text-decoration: line-through;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-img {
+            max-height: 100px;
+            object-fit: contain;
+        }
+
+        [data-bs-theme="dark"] .warp-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-bs-theme="dark"] .warp-item.checked {
+            background-color: rgba(40, 167, 69, 0.3);
+        }
+
+        [data-bs-theme="dark"] body {
+            background-color: #212529;
+        }
+
+        [data-bs-theme="dark"] .card-header.bg-primary {
+            background-color: #1a365d !important;
+        }
+
+        .section-divider {
+            border-top: 1px solid rgba(0, 0, 0, .125);
+            margin: 0.75rem 0;
+        }
+
+        [data-bs-theme="dark"] .section-divider {
+            border-top-color: rgba(255, 255, 255, .125);
+        }
+
+        .section-header {
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .warp-item {
+            padding: 0.25rem 0.5rem !important;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .col-md-4,
+        .col-sm-6 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.25rem !important;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Iron Mario 64 Warp Checklist</h1>
+                <div class="d-flex">
+                    <button id="themeToggle" class="btn btn-outline-light me-2">
+                        <span class="theme-text">🌙 Dark Mode</span>
+                    </button>
+                    <button id="clearBtn" class="btn btn-danger">Reset</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="warpList">
+                    <!-- Warps will be added here by JavaScript -->
+                </div>
+            </div>
+            <div class="card-footer text-center text-muted">
+                Click on a warp to mark it as used
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Theme handling
+            const getStoredTheme = () => localStorage.getItem('theme');
+            const setStoredTheme = theme => localStorage.setItem('theme', theme);
+
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                const themeText = document.querySelector('.theme-text');
+                if (themeText) {
+                    themeText.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+                }
+            };
+
+            setTheme(getPreferredTheme());
+
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setStoredTheme(newTheme);
+                setTheme(newTheme);
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const storedTheme = getStoredTheme();
+                if (!storedTheme) {
+                    setTheme(getPreferredTheme());
+                }
+            });
+
+            const sections = {
+                "First Floor": [
+                    "Bob-omb Battlefield",
+                    "Bowser in the Dark World",
+                    "Cool, Cool Mountain",
+                    "Wing Cap", "Whomp's Fortress",
+                    "Jolly Roger Bay",
+                    "Aquarium",
+                    "Slide",
+                ],
+                "Basement": [
+                    "Hazy Maze Cave",
+                    "Shifting Sand Land",
+                    "Lethal Lava Land",
+                    "Dire, Dire Docks",
+                    "Bowser in the Fire Sea",
+                ], "Second Floor": [
+                    "Snowman's Land",
+                    "Wet-Dry World",
+                    "Tall, Tall Mountain",
+                    "Tiny, Huge Island",
+                ], "Third Floor": [
+                    "Tick Tock Clock",
+                    "Rainbow Ride",
+                    "Wing Mario Over the Rainbows",
+                    "Bowser in the Sky",
+                ], "Misc.": [
+                    "Big Boo's Haunt",
+                    "Vanish Cap",
+                    "Metal Cap",
+                ],
+            };
+
+            const warpList = document.getElementById('warpList');
+            const clearBtn = document.getElementById('clearBtn');
+
+            Object.entries(sections).forEach(([sectionName, sectionWarps]) => {
+                // Create section header
+                const sectionHeader = document.createElement('h5');
+                sectionHeader.className = 'mt-4 mb-3 section-header';
+                sectionHeader.textContent = sectionName;
+                warpList.appendChild(sectionHeader);
+
+                // Create row for this section
+                const sectionRow = document.createElement('div');
+                sectionRow.className = 'row';
+                warpList.appendChild(sectionRow);
+
+                // Add warps for this section
+                sectionWarps.forEach(warp => {
+                    const col = document.createElement('div');
+                    col.className = 'col-lg-3 col-md-4 col-sm-6 mb-2'; // Added col-lg-3 for 4 items per row on large screens
+
+                    const item = document.createElement('div');
+                    item.className = 'warp-item p-2 rounded d-flex align-items-center';
+                    item.dataset.warp = warp;
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'form-check-input me-2';
+
+                    // For Bob-omb Battlefield, ensure it's checked by default
+                    if (warp === "Bob-omb Battlefield") {
+                        item.classList.add('checked');
+                        checkbox.checked = true;
+                    }
+
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label flex-grow-1';
+                    label.textContent = warp;
+
+                    item.appendChild(checkbox);
+                    item.appendChild(label);
+                    col.appendChild(item);
+                    sectionRow.appendChild(col);
+
+                    // Add click event
+                    item.addEventListener('click', function () {
+                        this.classList.toggle('checked');
+                        checkbox.checked = !checkbox.checked;
+                    });
+                });
+
+                // After all warps are added to a section, add a divider (except after the last section)
+                if (sectionName !== "Misc.") {
+                    const divider = document.createElement('div');
+                    divider.className = 'section-divider';
+                    warpList.appendChild(divider);
+                }
+            });
+
+            // Clear button - modified to keep Bob-omb Battlefield checked
+            clearBtn.addEventListener('click', function () {
+                document.querySelectorAll('.warp-item').forEach(item => {
+                    const warpName = item.dataset.warp;
+                    if (warpName === "Bob-omb Battlefield") {
+                        item.classList.add('checked');
+                        item.querySelector('input').checked = true;
+                    } else {
+                        item.classList.remove('checked');
+                        item.querySelector('input').checked = false;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
