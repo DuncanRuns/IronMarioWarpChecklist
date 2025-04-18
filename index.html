@@ -298,6 +298,11 @@
                         this.classList.toggle('checked');
                         checkbox.checked = !checkbox.checked;
                     });
+
+                    // Prevent double-toggling when clicking directly on checkbox
+                    checkbox.addEventListener('click', function (event) {
+                        event.stopPropagation();
+                    });
                 });
 
                 // Add divider after each section except the last
