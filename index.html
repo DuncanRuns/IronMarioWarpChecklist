@@ -271,46 +271,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Theme configuration - simplified
             function setTheme(theme) {
-                // Set theme attribute on document
                 document.documentElement.setAttribute('data-bs-theme', theme);
-
-                // Update button icon
                 const themeText = document.querySelector('.theme-text');
                 if (themeText) {
                     themeText.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
                 }
-
-                // Store in localStorage
                 localStorage.setItem('theme', theme);
             }
 
-            // Load initial theme
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
                 setTheme(savedTheme);
             } else {
-                // Default to dark if no saved preference
                 setTheme('dark');
             }
 
-            // Theme toggle - direct implementation
             document.getElementById('themeToggle').addEventListener('click', function () {
-                // Get current theme
                 const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-
-                // Toggle theme
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-                // Apply new theme
                 setTheme(newTheme);
-
-                // Save configuration
                 saveConfig();
             });
 
-            // Short names mapping
             const shortNames = {
                 "Bob-omb Battlefield": "BOB",
                 "Bowser in the Dark World": "BitDW",
@@ -338,7 +321,6 @@
                 "Metal Cap": "Metal"
             };
 
-            // Get all UI elements first
             const shortModeToggle = document.getElementById('shortModeToggle');
             const layoutToggle = document.getElementById('layoutToggle');
             const compactLayout = document.querySelector('.checklist-container');
@@ -352,12 +334,10 @@
             const warpList = document.getElementById('warpList');
             const clearBtn = document.getElementById('clearBtn');
 
-            // Initialize state variables
             let shortModeEnabled = false;
             let columnViewEnabled = true;
             let columnCount = 1;
 
-            // Configuration storage functions
             function saveConfig() {
                 const config = {
                     theme: document.documentElement.getAttribute('data-bs-theme'),
