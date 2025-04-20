@@ -17,12 +17,10 @@
 
         .warp-item.checked {
             background-color: rgba(40, 167, 69, 0.4);
-            text-decoration: line-through;
         }
 
         .warp-item.played {
             background-color: rgba(220, 53, 69, 0.4);
-            font-style: italic;
         }
 
         [data-bs-theme="dark"] .warp-item.played {
@@ -31,8 +29,6 @@
 
         .warp-item.checked.played {
             background: linear-gradient(135deg, rgba(40, 167, 69, 0.4) 50%, rgba(220, 53, 69, 0.4) 50%);
-            text-decoration: line-through;
-            font-style: italic;
         }
 
         [data-bs-theme="dark"] .warp-item.checked.played {
@@ -276,32 +272,19 @@
                     item.className = 'warp-item rounded d-flex align-items-center';
                     item.dataset.warp = warp;
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'form-check-input me-1';
-
-                    if (warp === "Bob-omb Battlefield") {
-                        item.classList.add('checked');
-                        checkbox.checked = true;
-                    }
-
                     const label = document.createElement('label');
                     label.className = 'form-check-label flex-grow-1';
                     label.textContent = warp;
 
-                    item.appendChild(checkbox);
                     item.appendChild(label);
                     sectionItems.appendChild(item);
 
+                    if (warp === "Bob-omb Battlefield") {
+                        item.classList.add('checked');
+                    }
+
                     item.addEventListener('click', function (event) {
-                        if (event.target !== checkbox) {
-                            checkbox.checked = !checkbox.checked;
-                        }
-                        if (checkbox.checked) {
-                            this.classList.add('checked');
-                        } else {
-                            this.classList.remove('checked');
-                        }
+                        this.classList.toggle('checked');
                     });
 
                     item.addEventListener('contextmenu', function (event) {
@@ -328,10 +311,8 @@
                     const warpName = item.dataset.warp;
                     if (warpName === "Bob-omb Battlefield") {
                         item.classList.add('checked');
-                        item.querySelector('input').checked = true;
                     } else {
                         item.classList.remove('checked');
-                        item.querySelector('input').checked = false;
                     }
                     item.classList.remove('played');
                 });
