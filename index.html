@@ -142,6 +142,33 @@
                 align-items: flex-end;
             }
         }
+
+        /* Add these styles for column layout */
+        .section-items.column-view {
+            display: grid;
+            grid-template-columns: repeat(var(--column-count, 1), 1fr);
+            gap: 0.15rem;
+        }
+
+        .section-items.row-view {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.15rem;
+        }
+
+        .section-items.row-view .warp-item {
+            flex: 0 0 auto;
+            margin-right: 0.15rem;
+        }
+
+        #columnCount {
+            min-width: 2rem;
+            pointer-events: none;
+        }
+
+        .btn-group {
+            display: inline-flex;
+        }
     </style>
 </head>
 
@@ -160,6 +187,14 @@
             <button id="layoutToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
                 <span>Hide Labels</span>
             </button>
+            <button id="viewModeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
+                <span>Columns</span>
+            </button>
+            <div id="columnControls" class="btn-group me-1">
+                <button id="decreaseColumns" class="btn btn-sm btn-outline-light btn-icon">-</button>
+                <span id="columnCount" class="btn btn-sm btn-outline-light btn-icon">1</span>
+                <button id="increaseColumns" class="btn btn-sm btn-outline-light btn-icon">+</button>
+            </div>
             <button id="themeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
                 <span class="theme-text">🌙</span>
             </button>
@@ -266,6 +301,66 @@
                 layoutToggle.querySelector('span').textContent =
                     compactLayout.classList.contains('hide-labels') ? 'Show Labels' : 'Hide Labels';
             });
+
+            // View mode toggle (row/column)
+            const viewModeToggle = document.getElementById('viewModeToggle');
+            const columnControls = document.getElementById('columnControls');
+            const decreaseColumns = document.getElementById('decreaseColumns');
+            const increaseColumns = document.getElementById('increaseColumns');
+            const columnCountDisplay = document.getElementById('columnCount');
+            let columnViewEnabled = true;
+            let columnCount = 1;
+
+            // Initialize column view
+            document.querySelectorAll('.section-items').forEach(section => {
+                section.classList.add('column-view');
+                section.style.setProperty('--column-count', columnCount);
+            });
+
+            viewModeToggle.addEventListener('click', () => {
+                columnViewEnabled = !columnViewEnabled;
+                updateViewMode();
+                viewModeToggle.querySelector('span').textContent =
+                    columnViewEnabled ? 'Columns' : 'Rows';
+            });
+
+            decreaseColumns.addEventListener('click', () => {
+                if (columnCount > 1) {
+                    columnCount--;
+                    updateColumnCount();
+                }
+            });
+
+            increaseColumns.addEventListener('click', () => {
+                columnCount++;
+                updateColumnCount();
+            });
+
+            function updateViewMode() {
+                document.querySelectorAll('.section-items').forEach(section => {
+                    if (columnViewEnabled) {
+                        section.classList.add('column-view');
+                        section.classList.remove('row-view');
+                        section.style.setProperty('--column-count', columnCount);
+                    } else {
+                        section.classList.remove('column-view');
+                        section.classList.add('row-view');
+                    }
+                });
+
+                // Show/hide column controls based on view mode
+                columnControls.style.display = columnViewEnabled ? 'inline-flex' : 'none';
+            }
+
+            function updateColumnCount() {
+                columnCountDisplay.textContent = columnCount;
+                document.querySelectorAll('.section-items.column-view').forEach(section => {
+                    section.style.setProperty('--column-count', columnCount);
+                });
+            }
+
+            // Initialize column controls visibility
+            updateViewMode();
 
             const sections = {
                 "First Floor": [
