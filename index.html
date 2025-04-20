@@ -413,7 +413,7 @@
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 setStoredTheme(newTheme);
                 setTheme(newTheme);
-                saveConfig(); // Save after state change
+                saveConfig();
             });
 
             // Short mode toggle functionality
@@ -422,7 +422,7 @@
                 updateLabelDisplay();
                 shortModeToggle.querySelector('span').textContent =
                     shortModeEnabled ? 'Full Names' : 'Short Names';
-                saveConfig(); // Save after state change
+                saveConfig();
             });
 
             function updateLabelDisplay() {
@@ -442,7 +442,7 @@
                 compactLayout.classList.toggle('hide-labels');
                 layoutToggle.querySelector('span').textContent =
                     compactLayout.classList.contains('hide-labels') ? 'Show Section Labels' : 'Hide Section Labels';
-                saveConfig(); // Save after state change
+                saveConfig();
             });
 
             // View mode toggle functionality
@@ -451,21 +451,21 @@
                 updateViewMode();
                 viewModeToggle.querySelector('span').textContent =
                     columnViewEnabled ? 'Columns' : 'Rows';
-                saveConfig(); // Save after state change
+                saveConfig();
             });
 
             decreaseColumns.addEventListener('click', () => {
                 if (columnCount > 1) {
                     columnCount--;
                     updateColumnCount();
-                    saveConfig(); // Save after state change
+                    saveConfig();
                 }
             });
 
             increaseColumns.addEventListener('click', () => {
                 columnCount++;
                 updateColumnCount();
-                saveConfig(); // Save after state change
+                saveConfig();
             });
 
             function updateViewMode() {
@@ -575,13 +575,13 @@
 
                     item.addEventListener('click', function (event) {
                         this.classList.toggle('checked');
-                        saveConfig(); // Save after state change
+                        saveConfig();
                     });
 
                     item.addEventListener('contextmenu', function (event) {
                         event.preventDefault();
                         this.classList.toggle('played');
-                        saveConfig(); // Save after state change
+                        saveConfig();
                     });
                 });
 
