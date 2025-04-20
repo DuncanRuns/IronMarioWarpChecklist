@@ -137,7 +137,7 @@
             <button id="themeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
                 <span class="theme-text">🌙</span>
             </button>
-            <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset</button>
+            <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset (R)</button>
         </div>
     </div>
 
@@ -294,8 +294,15 @@
                 }
             });
 
-            // Clear button - modified to keep Bob-omb Battlefield checked
-            clearBtn.addEventListener('click', function () {
+            // Add keyboard shortcut for reset
+            document.addEventListener('keydown', function (event) {
+                if (event.key.toLowerCase() === 'r') {
+                    resetChecklist();
+                }
+            });
+
+            // Extract reset functionality to a separate function
+            function resetChecklist() {
                 document.querySelectorAll('.warp-item').forEach(item => {
                     const warpName = item.dataset.warp;
                     if (warpName === "Bob-omb Battlefield") {
@@ -307,7 +314,10 @@
                     }
                     item.classList.remove('played'); // Always clear played status
                 });
-            });
+            }
+
+            // Update clear button to use the new function
+            clearBtn.addEventListener('click', resetChecklist);
         });
     </script>
 </body>
