@@ -20,75 +20,38 @@
             text-decoration: line-through;
         }
 
+        .warp-item.played {
+            background-color: rgba(220, 53, 69, 0.2);
+            font-style: italic;
+        }
+
+        [data-bs-theme="dark"] .warp-item.played {
+            background-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .warp-item.checked.played {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 50%, rgba(220, 53, 69, 0.2) 50%);
+            text-decoration: line-through;
+            font-style: italic;
+        }
+
+        [data-bs-theme="dark"] .warp-item.checked.played {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.3) 50%, rgba(220, 53, 69, 0.3) 50%);
+        }
+
+        /* Updated styles for OBS layout */
         body {
-            background-color: #f8f9fa;
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
         }
 
-        .card {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .container-fluid {
+            padding: 0;
         }
 
-        .header-img {
-            max-height: 100px;
-            object-fit: contain;
-        }
-
-        [data-bs-theme="dark"] .warp-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        [data-bs-theme="dark"] .warp-item.checked {
-            background-color: rgba(40, 167, 69, 0.3);
-        }
-
-        [data-bs-theme="dark"] body {
-            background-color: #212529;
-        }
-
-        [data-bs-theme="dark"] .card-header.bg-primary {
-            background-color: #1a365d !important;
-        }
-
-        .section-divider {
-            border-top: 1px solid rgba(0, 0, 0, .125);
-            margin: 0.75rem 0;
-        }
-
-        [data-bs-theme="dark"] .section-divider {
-            border-top-color: rgba(255, 255, 255, .125);
-        }
-
-        .section-header {
-            padding-bottom: 0.25rem;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .warp-item {
-            padding: 0.25rem 0.5rem !important;
-            margin-bottom: 0.25rem;
-            font-size: 0.9rem;
-        }
-
-        .col-md-4,
-        .col-sm-6 {
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-        }
-
-        .mb-2 {
-            margin-bottom: 0.25rem !important;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        /* New compact layout styles */
-        .compact-layout {
+        .checklist-container {
             width: 100%;
-            /* Allow it to expand to full width */
-            margin: 0 auto;
         }
 
         .section-container {
@@ -114,19 +77,15 @@
             font-size: 0.8rem;
         }
 
-        .card-body {
-            padding: 0.5rem;
-        }
-
-        .card-header {
-            padding: 0.5rem;
-        }
-
         .section-divider {
+            border-top: 1px solid rgba(0, 0, 0, .125);
             margin: 0.25rem 0;
         }
 
-        /* Hide section labels for OBS cropping if needed */
+        [data-bs-theme="dark"] .section-divider {
+            border-top-color: rgba(255, 255, 255, .125);
+        }
+
         .hide-labels .section-label {
             display: none;
         }
@@ -135,35 +94,50 @@
             width: 100%;
         }
 
-        /* Make buttons more compact */
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
         .btn-icon {
             padding: 0.25rem 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .instructions {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
 
 <body>
-    <div class="container py-2">
-        <div class="card mb-2 compact-layout">
-            <div class="card-header bg-primary text-white d-flex justify-content-end align-items-center">
-                <div class="d-flex">
-                    <button id="layoutToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
-                        <span>Hide Labels</span>
-                    </button>
-                    <button id="themeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
-                        <span class="theme-text">🌙</span>
-                    </button>
-                    <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset</button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="warpList">
-                    <!-- Warps will be added here by JavaScript -->
-                </div>
-            </div>
+    <div class="container-fluid">
+        <div class="checklist-container" id="warpList">
+            <!-- Warps will be added here by JavaScript -->
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="instructions">
+            <span class="me-2">Left-click: Mark warp used</span>
+            <span>Right-click: Mark level played</span>
+        </div>
+        <div class="buttons">
+            <button id="layoutToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
+                <span>Hide Labels</span>
+            </button>
+            <button id="themeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
+                <span class="theme-text">🌙</span>
+            </button>
+            <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset</button>
         </div>
     </div>
 
@@ -304,6 +278,12 @@
                             this.classList.remove('checked');
                         }
                     });
+
+                    // Add right-click handler for marking as played
+                    item.addEventListener('contextmenu', function (event) {
+                        event.preventDefault(); // Prevent context menu
+                        this.classList.toggle('played');
+                    });
                 });
 
                 // Add divider after each section except the last
@@ -325,6 +305,7 @@
                         item.classList.remove('checked');
                         item.querySelector('input').checked = false;
                     }
+                    item.classList.remove('played'); // Always clear played status
                 });
             });
         });
