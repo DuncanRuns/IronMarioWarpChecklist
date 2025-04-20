@@ -211,6 +211,26 @@
         .controls-menu .btn-group {
             display: flex;
         }
+
+        /* Fix for column controls to make a solid rectangle */
+        #columnControls {
+            display: inline-flex;
+        }
+
+        #columnControls .btn,
+        #columnControls span {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2rem;
+        }
+
+        /* Fix for burger menu shifting - keep controls visible but disabled */
+        #columnControls.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -230,7 +250,7 @@
             <span>Short Names</span>
         </button>
         <button id="layoutToggle" class="btn btn-sm btn-outline-light btn-icon">
-            <span>Hide Labels</span>
+            <span>Hide Section Labels</span>
         </button>
         <button id="viewModeToggle" class="btn btn-sm btn-outline-light btn-icon">
             <span>Columns</span>
@@ -251,41 +271,43 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Theme configuration
-            const getStoredTheme = () => localStorage.getItem('theme');
-            const setStoredTheme = theme => localStorage.setItem('theme', theme);
-
-            const getPreferredTheme = () => {
-                const storedTheme = getStoredTheme();
-                if (storedTheme) {
-                    return storedTheme;
-                }
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            };
-
-            const setTheme = theme => {
+            // Theme configuration - simplified
+            function setTheme(theme) {
+                // Set theme attribute on document
                 document.documentElement.setAttribute('data-bs-theme', theme);
+
+                // Update button icon
                 const themeText = document.querySelector('.theme-text');
                 if (themeText) {
                     themeText.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
                 }
-            };
 
-            setTheme(getPreferredTheme());
+                // Store in localStorage
+                localStorage.setItem('theme', theme);
+            }
 
-            const themeToggle = document.getElementById('themeToggle');
-            themeToggle.addEventListener('click', () => {
+            // Load initial theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                // Default to dark if no saved preference
+                setTheme('dark');
+            }
+
+            // Theme toggle - direct implementation
+            document.getElementById('themeToggle').addEventListener('click', function () {
+                // Get current theme
                 const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                setStoredTheme(newTheme);
-                setTheme(newTheme);
-            });
 
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                const storedTheme = getStoredTheme();
-                if (!storedTheme) {
-                    setTheme(getPreferredTheme());
-                }
+                // Toggle theme
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                // Apply new theme
+                setTheme(newTheme);
+
+                // Save configuration
+                saveConfig();
             });
 
             // Short names mapping
@@ -316,15 +338,111 @@
                 "Metal Cap": "Metal"
             };
 
-            // Short mode toggle
+            // Get all UI elements first
             const shortModeToggle = document.getElementById('shortModeToggle');
-            let shortModeEnabled = false;
+            const layoutToggle = document.getElementById('layoutToggle');
+            const compactLayout = document.querySelector('.checklist-container');
+            const viewModeToggle = document.getElementById('viewModeToggle');
+            const columnControls = document.getElementById('columnControls');
+            const decreaseColumns = document.getElementById('decreaseColumns');
+            const increaseColumns = document.getElementById('increaseColumns');
+            const columnCountDisplay = document.getElementById('columnCount');
+            const burgerMenu = document.querySelector('.burger-menu');
+            const controlsMenu = document.querySelector('.controls-menu');
+            const warpList = document.getElementById('warpList');
+            const clearBtn = document.getElementById('clearBtn');
 
+            // Initialize state variables
+            let shortModeEnabled = false;
+            let columnViewEnabled = true;
+            let columnCount = 1;
+
+            // Configuration storage functions
+            function saveConfig() {
+                const config = {
+                    theme: document.documentElement.getAttribute('data-bs-theme'),
+                    shortMode: shortModeEnabled,
+                    hideLabels: compactLayout.classList.contains('hide-labels'),
+                    columnView: columnViewEnabled,
+                    columnCount: columnCount,
+                    checkedItems: Array.from(document.querySelectorAll('.warp-item.checked'))
+                        .map(item => item.dataset.warp),
+                    playedItems: Array.from(document.querySelectorAll('.warp-item.played'))
+                        .map(item => item.dataset.warp)
+                };
+
+                localStorage.setItem('mario64Config', JSON.stringify(config));
+            }
+
+            function loadConfig() {
+                const savedConfig = localStorage.getItem('mario64Config');
+                if (savedConfig) {
+                    const config = JSON.parse(savedConfig);
+
+                    // Apply theme directly
+                    if (config.theme) {
+                        setTheme(config.theme);
+                    }
+
+                    // Apply short mode
+                    shortModeEnabled = config.shortMode;
+                    updateLabelDisplay();
+                    shortModeToggle.querySelector('span').textContent =
+                        shortModeEnabled ? 'Full Names' : 'Short Names';
+
+                    // Apply layout
+                    if (config.hideLabels) {
+                        compactLayout.classList.add('hide-labels');
+                        layoutToggle.querySelector('span').textContent = 'Show Labels';
+                    }
+
+                    // Apply column view
+                    columnViewEnabled = config.columnView;
+                    columnCount = config.columnCount || 1;
+                    updateViewMode();
+                    updateColumnCount();
+                    viewModeToggle.querySelector('span').textContent =
+                        columnViewEnabled ? 'Columns' : 'Rows';
+
+                    // Restore checked and played items
+                    if (config.checkedItems) {
+                        document.querySelectorAll('.warp-item').forEach(item => {
+                            if (config.checkedItems.includes(item.dataset.warp)) {
+                                item.classList.add('checked');
+                            } else if (item.dataset.warp !== "Bob-omb Battlefield") {
+                                item.classList.remove('checked');
+                            }
+                        });
+                    }
+
+                    if (config.playedItems) {
+                        document.querySelectorAll('.warp-item').forEach(item => {
+                            if (config.playedItems.includes(item.dataset.warp)) {
+                                item.classList.add('played');
+                            } else {
+                                item.classList.remove('played');
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Theme toggle functionality
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setStoredTheme(newTheme);
+                setTheme(newTheme);
+                saveConfig(); // Save after state change
+            });
+
+            // Short mode toggle functionality
             shortModeToggle.addEventListener('click', () => {
                 shortModeEnabled = !shortModeEnabled;
                 updateLabelDisplay();
                 shortModeToggle.querySelector('span').textContent =
                     shortModeEnabled ? 'Full Names' : 'Short Names';
+                saveConfig(); // Save after state change
             });
 
             function updateLabelDisplay() {
@@ -339,42 +457,35 @@
                 });
             }
 
-            // Layout toggle
-            const layoutToggle = document.getElementById('layoutToggle');
-            const compactLayout = document.querySelector('.checklist-container');
-
+            // Layout toggle functionality
             layoutToggle.addEventListener('click', () => {
                 compactLayout.classList.toggle('hide-labels');
                 layoutToggle.querySelector('span').textContent =
-                    compactLayout.classList.contains('hide-labels') ? 'Show Labels' : 'Hide Labels';
+                    compactLayout.classList.contains('hide-labels') ? 'Show Section Labels' : 'Hide Section Labels';
+                saveConfig(); // Save after state change
             });
 
-            // View mode toggle (row/column)
-            const viewModeToggle = document.getElementById('viewModeToggle');
-            const columnControls = document.getElementById('columnControls');
-            const decreaseColumns = document.getElementById('decreaseColumns');
-            const increaseColumns = document.getElementById('increaseColumns');
-            const columnCountDisplay = document.getElementById('columnCount');
-            let columnViewEnabled = true;
-            let columnCount = 1;
-
+            // View mode toggle functionality
             viewModeToggle.addEventListener('click', () => {
                 columnViewEnabled = !columnViewEnabled;
                 updateViewMode();
                 viewModeToggle.querySelector('span').textContent =
                     columnViewEnabled ? 'Columns' : 'Rows';
+                saveConfig(); // Save after state change
             });
 
             decreaseColumns.addEventListener('click', () => {
                 if (columnCount > 1) {
                     columnCount--;
                     updateColumnCount();
+                    saveConfig(); // Save after state change
                 }
             });
 
             increaseColumns.addEventListener('click', () => {
                 columnCount++;
                 updateColumnCount();
+                saveConfig(); // Save after state change
             });
 
             function updateViewMode() {
@@ -389,8 +500,11 @@
                     }
                 });
 
-                // Show/hide column controls based on view mode
-                columnControls.style.display = columnViewEnabled ? 'inline-flex' : 'none';
+                if (columnViewEnabled) {
+                    columnControls.classList.remove('disabled');
+                } else {
+                    columnControls.classList.add('disabled');
+                }
             }
 
             function updateColumnCount() {
@@ -404,9 +518,6 @@
             updateViewMode();
 
             // Burger menu functionality
-            const burgerMenu = document.querySelector('.burger-menu');
-            const controlsMenu = document.querySelector('.controls-menu');
-
             burgerMenu.addEventListener('click', () => {
                 controlsMenu.classList.toggle('show');
             });
@@ -451,9 +562,6 @@
                 ],
             };
 
-            const warpList = document.getElementById('warpList');
-            const clearBtn = document.getElementById('clearBtn');
-
             Object.entries(sections).forEach(([sectionName, sectionWarps]) => {
                 const sectionContainer = document.createElement('div');
                 sectionContainer.className = 'section-container';
@@ -487,11 +595,13 @@
 
                     item.addEventListener('click', function (event) {
                         this.classList.toggle('checked');
+                        saveConfig(); // Save after state change
                     });
 
                     item.addEventListener('contextmenu', function (event) {
                         event.preventDefault();
                         this.classList.toggle('played');
+                        saveConfig(); // Save after state change
                     });
                 });
 
@@ -523,9 +633,13 @@
                     }
                     item.classList.remove('played');
                 });
+                saveConfig(); // Save state after reset
             }
 
             clearBtn.addEventListener('click', resetChecklist);
+
+            // Load configuration after elements are created
+            loadConfig();
         });
     </script>
 </body>
