@@ -115,6 +115,37 @@
             font-size: 0.7rem;
             color: rgba(255, 255, 255, 0.8);
         }
+
+        /* New responsive styles */
+        @media (max-width: 576px) {
+            .controls {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .instructions {
+                display: none;
+            }
+
+            .buttons {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .btn-icon {
+                margin-bottom: 0.25rem;
+            }
+        }
+
+        /* Add a more extreme breakpoint for very narrow screens */
+        @media (max-width: 320px) {
+            .buttons {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+        }
     </style>
 </head>
 
