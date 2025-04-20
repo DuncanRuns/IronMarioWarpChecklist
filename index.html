@@ -358,12 +358,6 @@
             let columnViewEnabled = true;
             let columnCount = 1;
 
-            // Initialize column view
-            document.querySelectorAll('.section-items').forEach(section => {
-                section.classList.add('column-view');
-                section.style.setProperty('--column-count', columnCount);
-            });
-
             viewModeToggle.addEventListener('click', () => {
                 columnViewEnabled = !columnViewEnabled;
                 updateViewMode();
@@ -506,6 +500,11 @@
                     divider.className = 'section-divider';
                     warpList.appendChild(divider);
                 }
+            });
+
+            document.querySelectorAll('.section-items').forEach(section => {
+                section.classList.add('column-view');
+                section.style.setProperty('--column-count', columnCount);
             });
 
             document.addEventListener('keydown', function (event) {
