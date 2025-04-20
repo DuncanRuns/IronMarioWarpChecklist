@@ -92,14 +92,12 @@
 
         .controls {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 5px;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: space-between;
-            z-index: 1000;
+            bottom: 10px;
+            right: 10px;
+            background-color: transparent;
+            padding: 0;
+            display: block;
+            width: auto;
         }
 
         .btn-icon {
@@ -169,6 +167,50 @@
         .btn-group {
             display: inline-flex;
         }
+
+        /* Add styles for burger menu */
+        .burger-menu {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 1100;
+            cursor: pointer;
+        }
+
+        .burger-icon {
+            font-size: 1.5rem;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            padding: 5px 10px;
+        }
+
+        .controls-menu {
+            position: fixed;
+            bottom: 50px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 1050;
+            display: none;
+        }
+
+        .controls-menu.show {
+            display: block;
+        }
+
+        .controls-menu .btn-group,
+        .controls-menu button {
+            display: block;
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .controls-menu .btn-group {
+            display: flex;
+        }
     </style>
 </head>
 
@@ -179,27 +221,32 @@
         </div>
     </div>
 
-    <div class="controls">
-        <div class="buttons">
-            <button id="shortModeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
-                <span>Short Names</span>
-            </button>
-            <button id="layoutToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
-                <span>Hide Labels</span>
-            </button>
-            <button id="viewModeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
-                <span>Columns</span>
-            </button>
-            <div id="columnControls" class="btn-group me-1">
-                <button id="decreaseColumns" class="btn btn-sm btn-outline-light btn-icon">-</button>
-                <span id="columnCount" class="btn btn-sm btn-outline-light btn-icon">1</span>
-                <button id="increaseColumns" class="btn btn-sm btn-outline-light btn-icon">+</button>
-            </div>
-            <button id="themeToggle" class="btn btn-sm btn-outline-light me-1 btn-icon">
-                <span class="theme-text">🌙</span>
-            </button>
-            <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset (R)</button>
+    <div class="burger-menu">
+        <div class="burger-icon">☰</div>
+    </div>
+
+    <div class="controls-menu">
+        <button id="shortModeToggle" class="btn btn-sm btn-outline-light btn-icon">
+            <span>Short Names</span>
+        </button>
+        <button id="layoutToggle" class="btn btn-sm btn-outline-light btn-icon">
+            <span>Hide Labels</span>
+        </button>
+        <button id="viewModeToggle" class="btn btn-sm btn-outline-light btn-icon">
+            <span>Columns</span>
+        </button>
+        <div id="columnControls" class="btn-group">
+            <button id="decreaseColumns" class="btn btn-sm btn-outline-light btn-icon">-</button>
+            <span id="columnCount" class="btn btn-sm btn-outline-light btn-icon">1</span>
+            <button id="increaseColumns" class="btn btn-sm btn-outline-light btn-icon">+</button>
         </div>
+        <button id="themeToggle" class="btn btn-sm btn-outline-light btn-icon">
+            <span class="theme-text">🌙</span>
+        </button>
+    </div>
+
+    <div class="controls">
+        <button id="clearBtn" class="btn btn-sm btn-danger btn-icon">Reset (R)</button>
     </div>
 
     <script>
@@ -361,6 +408,21 @@
 
             // Initialize column controls visibility
             updateViewMode();
+
+            // Burger menu functionality
+            const burgerMenu = document.querySelector('.burger-menu');
+            const controlsMenu = document.querySelector('.controls-menu');
+
+            burgerMenu.addEventListener('click', () => {
+                controlsMenu.classList.toggle('show');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (event) => {
+                if (!burgerMenu.contains(event.target) && !controlsMenu.contains(event.target)) {
+                    controlsMenu.classList.remove('show');
+                }
+            });
 
             const sections = {
                 "First Floor": [
