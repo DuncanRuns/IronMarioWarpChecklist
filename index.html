@@ -120,7 +120,7 @@
 
 <body>
     <div class="container-fluid">
-        <div class="checklist-container" id="warpList">
+        <div class="checklist-container compact-layout" id="warpList">
             <!-- Warps will be added here by JavaScript -->
         </div>
     </div>
@@ -182,7 +182,7 @@
 
             // Add layout toggle functionality
             const layoutToggle = document.getElementById('layoutToggle');
-            const compactLayout = document.querySelector('.compact-layout');
+            const compactLayout = document.querySelector('.checklist-container');
 
             layoutToggle.addEventListener('click', () => {
                 compactLayout.classList.toggle('hide-labels');
