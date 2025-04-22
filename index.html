@@ -928,7 +928,12 @@
             });
 
             pastePrefsBtn.addEventListener('click', () => {
+                if (document.querySelector('.paste-preferences-dialog')) {
+                    return;
+                }
+
                 const pasteDialog = document.createElement('div');
+                pasteDialog.className = 'paste-preferences-dialog';
                 pasteDialog.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:var(--bs-body-bg);padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.3);max-width:90%;width:400px;';
 
                 pasteDialog.innerHTML = `
