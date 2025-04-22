@@ -309,6 +309,13 @@
             background-color: #007bff;
             color: white;
         }
+
+        /* Width limit container style - left-aligned instead of centered */
+        .width-limited {
+            max-width: var(--max-width, none);
+            margin: 0 auto 0 0;
+            /* Change from "0 auto" to "0 auto 0 0" to align left */
+        }
     </style>
 </head>
 
@@ -355,6 +362,9 @@
         </button>
         <button id="pastePrefsBtn" class="btn btn-sm btn-outline-light btn-icon">
             <span>Paste Preferences</span>
+        </button>
+        <button id="widthLimitBtn" class="btn btn-sm btn-outline-light btn-icon">
+            <span>Set Width Limit</span>
         </button>
     </div>
 
@@ -431,12 +441,14 @@
             const targetStarsCount = document.getElementById('targetStarsCount');
             const copyPrefsBtn = document.getElementById('copyPrefsBtn');
             const pastePrefsBtn = document.getElementById('pastePrefsBtn');
+            const widthLimitBtn = document.getElementById('widthLimitBtn');
 
             let shortModeEnabled = false;
             let columnViewEnabled = true;
             let columnCount = 1;
             let targetMode = false;
             let targetStars = {};
+            let maxWidth = null;
 
             function saveConfig() {
                 const config = {
@@ -449,7 +461,8 @@
                         .map(item => item.dataset.warp),
                     playedItems: Array.from(document.querySelectorAll('.warp-item.played'))
                         .map(item => item.dataset.warp),
-                    targetStars: targetStars
+                    targetStars: targetStars,
+                    maxWidth: maxWidth
                 };
 
                 localStorage.setItem('mario64Config', JSON.stringify(config));
@@ -511,6 +524,15 @@
                         targetStars = config.targetStars;
                         updateTargetBadges();
                         updateTargetSummary();
+                    }
+
+                    // Load width limit
+                    if (config.maxWidth) {
+                        maxWidth = config.maxWidth;
+                        const container = document.querySelector('.container-fluid');
+                        container.classList.add('width-limited');
+                        container.style.setProperty('--max-width', `${maxWidth}px`);
+                        widthLimitBtn.querySelector('span').textContent = 'Remove Width Limit';
                     }
                 }
             }
@@ -990,6 +1012,28 @@
                         });
                 }
             }
+
+            // Width limit button functionality
+            widthLimitBtn.addEventListener('click', () => {
+                if (maxWidth) {
+                    // Remove width limit
+                    maxWidth = null;
+                    document.querySelector('.container-fluid').style.removeProperty('max-width');
+                    document.querySelector('.container-fluid').classList.remove('width-limited');
+                    widthLimitBtn.querySelector('span').textContent = 'Set Width Limit';
+                } else {
+                    // Prompt for width limit
+                    const widthInput = prompt('Enter maximum width in pixels:', '800');
+                    if (widthInput && !isNaN(widthInput)) {
+                        maxWidth = parseInt(widthInput);
+                        const container = document.querySelector('.container-fluid');
+                        container.classList.add('width-limited');
+                        container.style.setProperty('--max-width', `${maxWidth}px`);
+                        widthLimitBtn.querySelector('span').textContent = 'Remove Width Limit';
+                    }
+                }
+                saveConfig();
+            });
 
             loadConfig();
             updateTargetBadges();
