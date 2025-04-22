@@ -468,7 +468,10 @@
 
                     if (config.hideLabels) {
                         compactLayout.classList.add('hide-labels');
-                        layoutToggle.querySelector('span').textContent = 'Show Labels';
+                        layoutToggle.querySelector('span').textContent = 'Show Section Labels';
+                    } else {
+                        compactLayout.classList.remove('hide-labels');
+                        layoutToggle.querySelector('span').textContent = 'Hide Section Labels';
                     }
 
                     columnViewEnabled = config.columnView;
