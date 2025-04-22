@@ -925,41 +925,49 @@
             });
 
             pastePrefsBtn.addEventListener('click', () => {
-                pastePrefsBtn.disabled = true;
+                const pasteDialog = document.createElement('div');
+                pasteDialog.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:var(--bs-body-bg);padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.3);max-width:90%;width:400px;';
 
-                navigator.clipboard.readText()
-                    .then(text => {
-                        try {
-                            const config = JSON.parse(text);
+                pasteDialog.innerHTML = `
+                    <h5>Paste Preferences</h5>
+                    <textarea style="width:100%;height:100px;margin:10px 0;" placeholder="Paste your configuration here"></textarea>
+                    <div style="display:flex;justify-content:flex-end;gap:10px;">
+                        <button class="btn btn-sm btn-secondary cancel-btn">Cancel</button>
+                        <button class="btn btn-sm btn-primary apply-btn">Apply</button>
+                    </div>
+                `;
 
-                            if (config.theme &&
-                                (config.checkedItems !== undefined ||
-                                    config.playedItems !== undefined)) {
+                document.body.appendChild(pasteDialog);
 
-                                localStorage.setItem('mario64Config', text);
+                const textarea = pasteDialog.querySelector('textarea');
+                const applyBtn = pasteDialog.querySelector('.apply-btn');
+                const cancelBtn = pasteDialog.querySelector('.cancel-btn');
 
-                                loadConfig();
+                textarea.focus();
 
-                                const originalText = pastePrefsBtn.querySelector('span').textContent;
-                                pastePrefsBtn.querySelector('span').textContent = 'Applied!';
-                                setTimeout(() => {
-                                    pastePrefsBtn.querySelector('span').textContent = originalText;
-                                    pastePrefsBtn.disabled = false;
-                                }, 1500);
-                            } else {
-                                throw new Error('Invalid configuration format');
-                            }
-                        } catch (e) {
-                            console.error('Failed to parse preferences: ', e);
-                            alert('Invalid preferences format. Please try again.');
-                            pastePrefsBtn.disabled = false;
+                cancelBtn.addEventListener('click', () => {
+                    document.body.removeChild(pasteDialog);
+                });
+
+                applyBtn.addEventListener('click', () => {
+                    const text = textarea.value;
+                    try {
+                        const config = JSON.parse(text);
+
+                        if (config.theme && (config.checkedItems !== undefined || config.playedItems !== undefined)) {
+                            localStorage.setItem('mario64Config', text);
+                            loadConfig();
+
+                            document.body.removeChild(pasteDialog);
+
+                            const originalText = pastePrefsBtn.querySelector('span').textContent;
+                        } else {
+                            throw new Error('Invalid configuration format');
                         }
-                    })
-                    .catch(err => {
-                        console.error('Failed to paste preferences: ', err);
-                        alert('Failed to paste preferences. Please try again.');
-                        pastePrefsBtn.disabled = false;
-                    });
+                    } catch (e) {
+                        alert('Invalid preferences format. Please try again.');
+                    }
+                });
             });
 
             function updateTargetModeButtons() {
