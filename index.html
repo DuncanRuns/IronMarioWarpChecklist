@@ -274,10 +274,6 @@
             font-weight: bold;
         }
 
-        .warp-item .target-badge {
-            display: none;
-        }
-
         .warp-item label {
             margin-right: 8px;
             overflow: hidden;
@@ -730,59 +726,50 @@
                     }
                     item.classList.remove('played');
                 });
-                saveConfig(); // Save state after reset
+                saveConfig();
             }
 
             clearBtn.addEventListener('click', resetChecklist);
 
-            // Easter egg implementation
             let keySequence = [];
             let easterEggTimeout = null;
             const easterEggElement = document.getElementById('easterEgg');
 
             document.addEventListener('keydown', function (event) {
-                // Handle 'r' key for reset
                 if (event.key.toLowerCase() === 'r') {
                     resetChecklist();
                     return;
                 }
 
-                // Easter egg sequence detection
                 keySequence.push(event.key.toLowerCase());
                 if (keySequence.length > 3) {
                     keySequence.shift();
                 }
 
-                // Check if the sequence is "mbp"
                 if (keySequence.join('') === 'mbp') {
                     showEasterEgg();
                 }
             });
 
             function showEasterEgg() {
-                // Clear any existing timeout to prevent weird behavior on re-activation
                 if (easterEggTimeout) {
                     clearTimeout(easterEggTimeout);
                 }
 
-                // Show the easter egg
                 easterEggElement.classList.add('show');
 
-                // Set timeout to hide it after 10 seconds
                 easterEggTimeout = setTimeout(function () {
                     easterEggElement.classList.remove('show');
                     easterEggTimeout = null;
                 }, 10000);
 
-                // Reset the sequence
                 keySequence = [];
             }
 
-            // Set Targets button functionality
             setTargetsBtn.addEventListener('click', () => {
                 targetMode = !targetMode;
                 warpList.classList.toggle('target-mode');
-                document.body.classList.toggle('target-mode', targetMode); // Add target-mode to body as well
+                document.body.classList.toggle('target-mode', targetMode);
                 setTargetsBtn.querySelector('span').textContent =
                     targetMode ? 'Done' : 'Set Targets';
 
@@ -790,18 +777,15 @@
                     // Keep burger menu open while in target mode
                     controlsMenu.classList.add('show');
 
-                    // Enter target mode
                     document.querySelectorAll('.warp-item').forEach(item => {
                         const warpName = item.dataset.warp;
                         const targetValue = targetStars[warpName] || 0;
 
-                        // Temporarily disable the click handler for checked status
                         const originalClickHandler = item._clickHandler;
                         if (originalClickHandler) {
                             item.removeEventListener('click', originalClickHandler);
                         }
 
-                        // Create input if it doesn't exist
                         if (!item.querySelector('.target-input')) {
                             const input = document.createElement('input');
                             input.type = 'number';
@@ -818,13 +802,11 @@
                                     delete targetStars[warpName];
                                 }
 
-                                // Update the label text immediately
                                 const label = item.querySelector('label');
                                 if (label) {
                                     const fullName = label.getAttribute('data-full-name');
                                     let displayName = shortModeEnabled ? shortNames[fullName] || fullName : fullName;
 
-                                    // Append target count if it exists
                                     if (value > 0) {
                                         displayName += ` (${value})`;
                                     }
@@ -836,7 +818,6 @@
                                 saveConfig();
                             });
 
-                            // Prevent clicks on the input from bubbling to the item
                             input.addEventListener('click', function (e) {
                                 e.stopPropagation();
                             });
@@ -848,12 +829,10 @@
                     // Always show target summary in edit mode
                     updateTargetSummary();
                 } else {
-                    // Exit target mode
                     document.querySelectorAll('.target-input').forEach(input => {
                         input.remove();
                     });
 
-                    // Restore click handlers
                     document.querySelectorAll('.warp-item').forEach(item => {
                         if (!item._clickHandler) {
                             item._clickHandler = function (event) {
@@ -864,7 +843,6 @@
                         item.addEventListener('click', item._clickHandler);
                     });
 
-                    // Only hide the controls menu when exiting target mode
                     controlsMenu.classList.remove('show');
 
                     updateTargetBadges();
@@ -873,10 +851,6 @@
             });
 
             function updateTargetBadges() {
-                // Remove existing badges
-                document.querySelectorAll('.target-badge').forEach(badge => badge.remove());
-
-                // Update all labels to include target counts
                 document.querySelectorAll('.warp-item').forEach(item => {
                     const warpName = item.dataset.warp;
                     const targetValue = targetStars[warpName];
@@ -886,7 +860,6 @@
                         const fullName = label.getAttribute('data-full-name');
                         let displayName = shortModeEnabled ? shortNames[fullName] || fullName : fullName;
 
-                        // Append target count if it exists
                         if (targetValue && targetValue > 0) {
                             displayName += ` (${targetValue})`;
                         }
@@ -900,12 +873,10 @@
                 let totalTargets = 0;
                 let hasAnyTargets = Object.keys(targetStars).length > 0;
 
-                // Calculate total of all targets
                 Object.values(targetStars).forEach(value => {
                     totalTargets += value;
                 });
 
-                // Calculate total of played targets
                 let playedTargets = 0;
                 document.querySelectorAll('.warp-item.played').forEach(item => {
                     const warpName = item.dataset.warp;
@@ -914,11 +885,9 @@
                     }
                 });
 
-                // Show summary if in target mode OR if any targets are set
                 if (targetMode || hasAnyTargets) {
                     targetSummary.classList.remove('d-none');
 
-                    // Change label based on mode
                     if (targetMode) {
                         targetSummary.innerHTML = `<span>Target Total: <span id="targetStarsCount">${totalTargets}</span></span>`;
                     } else {
@@ -929,7 +898,6 @@
                 }
             }
 
-            // Load configuration after elements are created
             loadConfig();
             updateTargetBadges();
             updateTargetSummary();
