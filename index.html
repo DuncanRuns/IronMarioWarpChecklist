@@ -35,7 +35,6 @@
             background: linear-gradient(135deg, rgba(40, 167, 69, 0.5) 50%, rgba(220, 53, 69, 0.5) 50%);
         }
 
-        /* Updated styles for OBS layout */
         body {
             background-color: transparent;
             margin: 0;
@@ -110,7 +109,6 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        /* New responsive styles */
         @media (max-width: 576px) {
             .controls {
                 flex-wrap: wrap;
@@ -133,7 +131,6 @@
             }
         }
 
-        /* Add a more extreme breakpoint for very narrow screens */
         @media (max-width: 320px) {
             .buttons {
                 flex-direction: column;
@@ -141,7 +138,6 @@
             }
         }
 
-        /* Add these styles for column layout */
         .section-items.column-view {
             display: grid;
             grid-template-columns: repeat(var(--column-count, 1), 1fr);
@@ -168,7 +164,6 @@
             display: inline-flex;
         }
 
-        /* Add styles for burger menu */
         .burger-menu {
             position: fixed;
             bottom: 10px;
@@ -212,7 +207,6 @@
             display: flex;
         }
 
-        /* Fix for column controls to make a solid rectangle */
         #columnControls {
             display: inline-flex;
         }
@@ -226,13 +220,11 @@
             min-width: 2rem;
         }
 
-        /* Fix for burger menu shifting - keep controls visible but disabled */
         #columnControls.disabled {
             opacity: 0.5;
             pointer-events: none;
         }
 
-        /* Easter egg styles */
         #easterEgg {
             position: fixed;
             top: 0;
@@ -253,7 +245,6 @@
             opacity: 0.8;
         }
 
-        /* Add styles for target mode */
         .target-mode .warp-item {
             cursor: pointer;
             position: relative;
@@ -281,21 +272,17 @@
             white-space: nowrap;
         }
 
-        /* Add styles for reset button positioning */
         #clearBtn {
             position: fixed;
             bottom: 10px;
             right: 10px;
             z-index: 1050;
-            /* Lower than burger menu but higher than most content */
         }
 
-        /* Hide reset button during target editing */
         .target-mode #clearBtn {
             display: none;
         }
 
-        /* Add styles for target mode menu transparency */
         .target-mode .controls-menu .btn-group,
         .target-mode .controls-menu button:not(#setTargetsBtn) {
             opacity: 0.5;
@@ -310,11 +297,9 @@
             color: white;
         }
 
-        /* Width limit container style - left-aligned instead of centered */
         .width-limited {
             max-width: var(--max-width, none);
             margin: 0 auto 0 0;
-            /* Change from "0 auto" to "0 auto 0 0" to align left */
         }
     </style>
 </head>
@@ -329,7 +314,6 @@
         </div>
     </div>
 
-    <!-- Easter egg element -->
     <div id="easterEgg"></div>
 
     <div class="burger-menu">
@@ -473,24 +457,20 @@
                 if (savedConfig) {
                     const config = JSON.parse(savedConfig);
 
-                    // Apply theme directly
                     if (config.theme) {
                         setTheme(config.theme);
                     }
 
-                    // Apply short mode
                     shortModeEnabled = config.shortMode;
                     updateLabelDisplay();
                     shortModeToggle.querySelector('span').textContent =
                         shortModeEnabled ? 'Full Names' : 'Short Names';
 
-                    // Apply layout
                     if (config.hideLabels) {
                         compactLayout.classList.add('hide-labels');
                         layoutToggle.querySelector('span').textContent = 'Show Labels';
                     }
 
-                    // Apply column view
                     columnViewEnabled = config.columnView;
                     columnCount = config.columnCount || 1;
                     updateViewMode();
@@ -498,7 +478,6 @@
                     viewModeToggle.querySelector('span').textContent =
                         columnViewEnabled ? 'Columns' : 'Rows';
 
-                    // Restore checked and played items
                     if (config.checkedItems) {
                         document.querySelectorAll('.warp-item').forEach(item => {
                             if (config.checkedItems.includes(item.dataset.warp)) {
@@ -519,14 +498,12 @@
                         });
                     }
 
-                    // Load target stars
                     if (config.targetStars) {
                         targetStars = config.targetStars;
                         updateTargetBadges();
                         updateTargetSummary();
                     }
 
-                    // Load width limit
                     if (config.maxWidth) {
                         maxWidth = config.maxWidth;
                         const container = document.querySelector('.container-fluid');
@@ -537,7 +514,6 @@
                 }
             }
 
-            // Theme toggle functionality
             themeToggle.addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-bs-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -546,7 +522,6 @@
                 saveConfig();
             });
 
-            // Short mode toggle functionality
             shortModeToggle.addEventListener('click', () => {
                 shortModeEnabled = !shortModeEnabled;
                 updateLabelDisplay();
@@ -807,7 +782,6 @@
                 updateTargetModeButtons();
 
                 if (targetMode) {
-                    // Keep burger menu open while in target mode
                     controlsMenu.classList.add('show');
 
                     document.querySelectorAll('.warp-item').forEach(item => {
@@ -859,7 +833,6 @@
                         }
                     });
 
-                    // Always show target summary in edit mode
                     updateTargetSummary();
                 } else {
                     document.querySelectorAll('.target-input').forEach(input => {
@@ -932,54 +905,46 @@
             copyPrefsBtn.addEventListener('click', () => {
                 const config = localStorage.getItem('mario64Config');
                 if (config) {
-                    // Disable the button during the operation
                     copyPrefsBtn.disabled = true;
 
                     navigator.clipboard.writeText(config)
                         .then(() => {
-                            // Visual feedback that copy worked
                             const originalText = copyPrefsBtn.querySelector('span').textContent;
                             copyPrefsBtn.querySelector('span').textContent = 'Copied!';
                             setTimeout(() => {
                                 copyPrefsBtn.querySelector('span').textContent = originalText;
-                                copyPrefsBtn.disabled = false; // Re-enable the button
+                                copyPrefsBtn.disabled = false;
                             }, 1500);
                         })
                         .catch(err => {
                             console.error('Failed to copy preferences: ', err);
                             alert('Failed to copy preferences. Please try again.');
-                            copyPrefsBtn.disabled = false; // Re-enable on error
+                            copyPrefsBtn.disabled = false;
                         });
                 }
             });
 
             pastePrefsBtn.addEventListener('click', () => {
-                // Disable the button during the operation
                 pastePrefsBtn.disabled = true;
 
                 navigator.clipboard.readText()
                     .then(text => {
                         try {
-                            // Validate JSON format
                             const config = JSON.parse(text);
 
-                            // Basic validation that this is a mario64Config
                             if (config.theme &&
                                 (config.checkedItems !== undefined ||
                                     config.playedItems !== undefined)) {
 
-                                // Save to localStorage
                                 localStorage.setItem('mario64Config', text);
 
-                                // Apply the configuration
                                 loadConfig();
 
-                                // Visual feedback
                                 const originalText = pastePrefsBtn.querySelector('span').textContent;
                                 pastePrefsBtn.querySelector('span').textContent = 'Applied!';
                                 setTimeout(() => {
                                     pastePrefsBtn.querySelector('span').textContent = originalText;
-                                    pastePrefsBtn.disabled = false; // Re-enable the button
+                                    pastePrefsBtn.disabled = false;
                                 }, 1500);
                             } else {
                                 throw new Error('Invalid configuration format');
@@ -987,13 +952,13 @@
                         } catch (e) {
                             console.error('Failed to parse preferences: ', e);
                             alert('Invalid preferences format. Please try again.');
-                            pastePrefsBtn.disabled = false; // Re-enable on error
+                            pastePrefsBtn.disabled = false;
                         }
                     })
                     .catch(err => {
                         console.error('Failed to paste preferences: ', err);
                         alert('Failed to paste preferences. Please try again.');
-                        pastePrefsBtn.disabled = false; // Re-enable on error
+                        pastePrefsBtn.disabled = false;
                     });
             });
 
@@ -1013,16 +978,13 @@
                 }
             }
 
-            // Width limit button functionality
             widthLimitBtn.addEventListener('click', () => {
                 if (maxWidth) {
-                    // Remove width limit
                     maxWidth = null;
                     document.querySelector('.container-fluid').style.removeProperty('max-width');
                     document.querySelector('.container-fluid').classList.remove('width-limited');
                     widthLimitBtn.querySelector('span').textContent = 'Set Width Limit';
                 } else {
-                    // Prompt for width limit
                     const widthInput = prompt('Enter maximum width in pixels:', '800');
                     if (widthInput && !isNaN(widthInput)) {
                         maxWidth = parseInt(widthInput);
