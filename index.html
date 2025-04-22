@@ -350,6 +350,12 @@
         <button id="themeToggle" class="btn btn-sm btn-outline-light btn-icon">
             <span class="theme-text">🌙</span>
         </button>
+        <button id="copyPrefsBtn" class="btn btn-sm btn-outline-light btn-icon">
+            <span>Copy Preferences</span>
+        </button>
+        <button id="pastePrefsBtn" class="btn btn-sm btn-outline-light btn-icon">
+            <span>Paste Preferences</span>
+        </button>
     </div>
 
     <div class="controls">
@@ -423,6 +429,8 @@
             const setTargetsBtn = document.getElementById('setTargetsBtn');
             const targetSummary = document.getElementById('targetSummary');
             const targetStarsCount = document.getElementById('targetStarsCount');
+            const copyPrefsBtn = document.getElementById('copyPrefsBtn');
+            const pastePrefsBtn = document.getElementById('pastePrefsBtn');
 
             let shortModeEnabled = false;
             let columnViewEnabled = true;
@@ -774,6 +782,8 @@
                 setTargetsBtn.querySelector('span').textContent =
                     targetMode ? 'Done' : 'Set Targets';
 
+                updateTargetModeButtons();
+
                 if (targetMode) {
                     // Keep burger menu open while in target mode
                     controlsMenu.classList.add('show');
@@ -896,6 +906,92 @@
                     }
                 } else {
                     targetSummary.classList.add('d-none');
+                }
+            }
+
+            copyPrefsBtn.addEventListener('click', () => {
+                const config = localStorage.getItem('mario64Config');
+                if (config) {
+                    // Disable the button during the operation
+                    copyPrefsBtn.disabled = true;
+
+                    navigator.clipboard.writeText(config)
+                        .then(() => {
+                            // Visual feedback that copy worked
+                            const originalText = copyPrefsBtn.querySelector('span').textContent;
+                            copyPrefsBtn.querySelector('span').textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyPrefsBtn.querySelector('span').textContent = originalText;
+                                copyPrefsBtn.disabled = false; // Re-enable the button
+                            }, 1500);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy preferences: ', err);
+                            alert('Failed to copy preferences. Please try again.');
+                            copyPrefsBtn.disabled = false; // Re-enable on error
+                        });
+                }
+            });
+
+            pastePrefsBtn.addEventListener('click', () => {
+                // Disable the button during the operation
+                pastePrefsBtn.disabled = true;
+
+                navigator.clipboard.readText()
+                    .then(text => {
+                        try {
+                            // Validate JSON format
+                            const config = JSON.parse(text);
+
+                            // Basic validation that this is a mario64Config
+                            if (config.theme &&
+                                (config.checkedItems !== undefined ||
+                                    config.playedItems !== undefined)) {
+
+                                // Save to localStorage
+                                localStorage.setItem('mario64Config', text);
+
+                                // Apply the configuration
+                                loadConfig();
+
+                                // Visual feedback
+                                const originalText = pastePrefsBtn.querySelector('span').textContent;
+                                pastePrefsBtn.querySelector('span').textContent = 'Applied!';
+                                setTimeout(() => {
+                                    pastePrefsBtn.querySelector('span').textContent = originalText;
+                                    pastePrefsBtn.disabled = false; // Re-enable the button
+                                }, 1500);
+                            } else {
+                                throw new Error('Invalid configuration format');
+                            }
+                        } catch (e) {
+                            console.error('Failed to parse preferences: ', e);
+                            alert('Invalid preferences format. Please try again.');
+                            pastePrefsBtn.disabled = false; // Re-enable on error
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to paste preferences: ', err);
+                        alert('Failed to paste preferences. Please try again.');
+                        pastePrefsBtn.disabled = false; // Re-enable on error
+                    });
+            });
+
+            function updateTargetModeButtons() {
+                if (targetMode) {
+                    // Disable other buttons during target mode
+                    document.querySelectorAll('.controls-menu .btn-group, .controls-menu button:not(#setTargetsBtn)')
+                        .forEach(el => {
+                            el.style.opacity = '0.5';
+                            el.style.pointerEvents = 'none';
+                        });
+                } else {
+                    // Re-enable buttons when exiting target mode
+                    document.querySelectorAll('.controls-menu .btn-group, .controls-menu button')
+                        .forEach(el => {
+                            el.style.opacity = '';
+                            el.style.pointerEvents = '';
+                        });
                 }
             }
 
