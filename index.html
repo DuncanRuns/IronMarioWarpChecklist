@@ -854,8 +854,6 @@
                         item.addEventListener('click', item._clickHandler);
                     });
 
-                    controlsMenu.classList.remove('show');
-
                     updateTargetBadges();
                     updateTargetSummary();
                 }
@@ -979,18 +977,16 @@
 
             function updateTargetModeButtons() {
                 if (targetMode) {
-                    // Disable other buttons during target mode
+                    // Fully hide other buttons during target mode
                     document.querySelectorAll('.controls-menu .btn-group, .controls-menu button:not(#setTargetsBtn)')
                         .forEach(el => {
-                            el.style.opacity = '0.5';
-                            el.style.pointerEvents = 'none';
+                            el.style.display = 'none';
                         });
                 } else {
-                    // Re-enable buttons when exiting target mode
+                    // Show buttons when exiting target mode
                     document.querySelectorAll('.controls-menu .btn-group, .controls-menu button')
                         .forEach(el => {
-                            el.style.opacity = '';
-                            el.style.pointerEvents = '';
+                            el.style.display = '';
                         });
                 }
             }
